@@ -1,7 +1,12 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import fetchMock from 'fetch-mock';
-import App from './App';
+import AppContainer from './App.container';
+import { Provider } from 'react-redux';
+import { applyMiddleware, createStore } from 'redux';
+import thunk from 'redux-thunk';
+
+import rootReducer from './reducers';
 
 const ARTICLES = [
   { name: 'Hiking shoes', weight: 0.7 },
@@ -17,7 +22,11 @@ describe('App', () => {
       'https://packing-list-weight-api.herokuapp.com/articles',
       ARTICLES
     );
-    appWrapper = mount(<App />);
+    const store = createStore(rootReducer, applyMiddleware(thunk));
+    appWrapper = mount(
+    <Provider store={store}>
+      <AppContainer />
+   </Provider>,);
   });
 
   afterEach(() => {
@@ -31,7 +40,7 @@ describe('App', () => {
       ).toHaveLength(1);
     });
   });
-
+ 
   describe('after articles fetched', () => {
     it('should render article list', done => {
       setImmediate(() => {
